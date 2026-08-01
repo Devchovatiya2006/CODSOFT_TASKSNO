@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RuleBot — Rule-Based Chatbot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon"><i class="fa-solid fa-robot"></i></div>
+        <div>
+          <h2>RuleBot <span class="badge-v">v2.0</span></h2>
+          <p>Rule-Based Chatbot</p>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h4><i class="fa-solid fa-bolt"></i> Quick Prompts</h4>
+        <div class="quick-list">
+          <button onclick="send('Hello!')">👋 Hello!</button>
+          <button onclick="send('My name is Alex')">👤 Set my name</button>
+          <button onclick="send('What is my name?')">❓ What is my name?</button>
+          <button onclick="send('How are you?')">💬 How are you?</button>
+          <button onclick="send('Calculate 99 * 12')">🧮 Calculate 99 × 12</button>
+          <button onclick="send('What time is it?')">🕒 What time is it?</button>
+          <button onclick="send('Tell me a joke')">😄 Tell me a joke</button>
+          <button onclick="send('Tell me a fact')">🤓 Random fact</button>
+          <button onclick="send('What is Python?')">🐍 What is Python?</button>
+          <button onclick="send('Help')">💡 Help</button>
+        </div>
+      </div>
+
+      <div class="sidebar-section memory-box">
+        <div class="mem-header">
+          <h4><i class="fa-solid fa-brain"></i> Memory</h4>
+          <button class="icon-btn" onclick="resetMemory()" title="Clear memory"><i class="fa-solid fa-rotate-left"></i></button>
+        </div>
+        <div id="memory-display"><span class="muted">No memory stored yet.</span></div>
+      </div>
+
+      <div class="sidebar-footer">
+        <p><i class="fa-solid fa-code"></i> CodSoft Internship Task</p>
+        <p class="muted">Pattern Matching · Regex · NLP</p>
+      </div>
+    </aside>
+
+    <!-- ── Main ── -->
+    <main class="main">
+
+      <!-- Header -->
+      <header class="topbar">
+        <div>
+          <h1>Chat with RuleBot</h1>
+          <p class="muted">Rule-based intent matching &amp; pattern recognition</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn-outline" onclick="exportChat()"><i class="fa-solid fa-download"></i> Export</button>
+          <button class="btn-danger" onclick="clearChat()"><i class="fa-solid fa-trash"></i> Clear</button>
+        </div>
+      </header>
+
+      <!-- Messages -->
+      <div class="messages" id="messages">
+        <div class="welcome">
+          <div class="welcome-icon"><i class="fa-solid fa-robot"></i></div>
+          <h3>Welcome to RuleBot! 🤖</h3>
+          <p>I understand natural language using pattern matching and predefined rules.<br/>Type anything or use the quick prompts on the left!</p>
+        </div>
+      </div>
+
+      <!-- Typing indicator -->
+      <div class="typing" id="typing" style="display:none">
+        <span></span><span></span><span></span>
+        <small>RuleBot is thinking...</small>
+      </div>
+
+      <!-- Diagnostics bar -->
+      <div class="diag-bar" id="diag-bar">
+        <span><i class="fa-solid fa-tag"></i> Intent: <strong id="d-intent">—</strong></span>
+        <span><i class="fa-solid fa-gauge-high"></i> Confidence: <strong id="d-conf">—</strong></span>
+        <span><i class="fa-solid fa-code"></i> Pattern: <code id="d-pattern">—</code></span>
+      </div>
+
+      <!-- Input -->
+      <div class="input-bar">
+        <input type="text" id="input" placeholder="Type your message..." autocomplete="off" onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button class="btn-send" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i> Send</button>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

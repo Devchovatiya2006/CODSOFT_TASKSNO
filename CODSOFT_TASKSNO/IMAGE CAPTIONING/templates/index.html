@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Captioning AI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🤖</div>
+            <h1>Image Captioning <span>AI</span></h1>
+            <p>Upload an image and let AI describe it for you</p>
+        </div>
+
+        <!-- Upload Area -->
+        <div class="upload-card">
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-icon">📸</div>
+                <p class="drop-text">Drag & Drop your image here</p>
+                <p class="drop-sub">or</p>
+                <label class="browse-btn" for="fileInput">Browse Image</label>
+                <input type="file" id="fileInput" accept="image/*" hidden>
+                <p class="drop-hint">Supports: JPG, PNG, GIF, WEBP (max 16MB)</p>
+            </div>
+        </div>
+
+        <!-- Preview + Result -->
+        <div class="result-card" id="resultCard" style="display:none;">
+            <div class="result-inner">
+                <div class="image-preview">
+                    <img id="previewImg" src="" alt="Uploaded Image">
+                </div>
+                <div class="caption-box">
+                    <div class="caption-label">✨ Generated Caption</div>
+                    <div class="caption-text" id="captionText">
+                        <div class="loading" id="loadingSpinner">
+                            <div class="spinner"></div>
+                            <span>Analyzing image...</span>
+                        </div>
+                    </div>
+                    <button class="try-again-btn" id="tryAgainBtn">Try Another Image</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div class="error-box" id="errorBox" style="display:none;">
+            <span>⚠️</span> <span id="errorMsg"></span>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Powered by <strong>ResNet50</strong> + <strong>LSTM</strong> | Built with PyTorch & Flask</p>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById("dropZone");
+        const fileInput = document.getElementById("fileInput");
+        const resultCard = document.getElementById("resultCard");
+        const previewImg = document.getElementById("previewImg");
+        const captionText = document.getElementById("captionText");
+        const loadingSpinner = document.getElementById("loadingSpinner");
+        const errorBox = document.getElementById("errorBox");
+        const errorMsg = document.getElementById("errorMsg");
+        const tryAgainBtn = document.getElementById("tryAgainBtn");
+
+        // Drag & Drop
+        dropZone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropZone.classList.add("drag-over");
+        });
+        dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
+        dropZone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dropZone.classList.remove("drag-over");
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        fileInput.addEventListener("change", () => {
+            if (fileInput.files[0]) handleFile(fileInput.files[0]);
+        });
+
+        tryAgainBtn.addEventListener("click", () => {
+            resultCard.style.display = "none";
+            errorBox.style.display = "none";
+            fileInput.value = "";
+        });
+
+        function handleFile(file) {
+            // Show preview immediately
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                resultCard.style.display = "block";
+                errorBox.style.display = "none";
+                loadingSpinner.style.display = "flex";
+                captionText.querySelector(".caption-result")?.remove();
+            };
+            reader.readAsDataURL(file);
+
+            // Upload & get caption
+            const formData = new FormData();
+            formData.append("image", file);
+
+            fetch("/caption", { method: "POST", body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    loadingSpinner.style.display = "none";
+                    if (data.error) {
+                        showError(data.error);
+                        return;
+                    }
+                    const p = document.createElement("p");
+                    p.className = "caption-result";
+                    p.textContent = `"${data.caption}"`;
+                    captionText.appendChild(p);
+                })
+                .catch(() => {
+                    loadingSpinner.style.display = "none";
+                    showError("Something went wrong. Please try again.");
+                });
+        }
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorBox.style.display = "flex";
+            resultCard.style.display = "none";
+        }
+    </script>
+</body>
+</html>
